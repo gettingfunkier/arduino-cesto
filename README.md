@@ -1,3 +1,7 @@
 # ARDUINO-CESTO
 
-Soul-cesto style arduino game
+> Soul-cesto style arduino game
+
+### Happening now:
+
+- Brainstorming
