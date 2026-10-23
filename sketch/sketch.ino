@@ -1,17 +1,19 @@
-#include <Adafruit_GFH.h>
-#include <Adafruit_ST7789.h>
+#include "pitches.h"
+// #include <Adafruit_GFH.h>
+// #include <Adafruit_ST7789.h>
 
-const int RED_PIN  = 2;
-const int BLUE_PIN = 3;
+const int BUTTON_PIN  = 2;
+const int JOY_HORZ    = A0;
+const int JOY_VERT    = A1;
 
-const int JOY_HORZ = A0;
-const int JOY_VERT = A1;
+const int MAX_WIDTH   = 128;
+const int MAX_HEIGHT  = 64;
+const int SET         = 1;
+const int CLEAR       = 0;
 
-const int MAX_WIDTH  = 128;
-const int MAX_HEIGHT = 64;
+int button_prev = 0;
 
-const int SET   = 1;
-const int CLEAR = 0;
+#define SPEAKER_PIN 3
 
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
@@ -21,9 +23,21 @@ void setup() {
 
     Serial.begin(9600);
 
-    // make inputs 2 and 3 button inputs with pullup
-    pinMode(RED_PIN, INPUT_PULLUP);
-    pinMode(BLUE_PIN, INPUT_PULLUP);
+    // make input 2 button and output 3 speaker
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(SPEAKER_PIN, OUTPUT);
+}
+
+void playSound() {
+    tone(SPEAKER_PIN, NOTE_G5);
+    delay(100);
+    tone(SPEAKER_PIN, NOTE_B5);
+    delay(100);
+    tone(SPEAKER_PIN, NOTE_D6);
+    delay(100);
+    tone(SPEAKER_PIN, NOTE_FS6);
+    delay(100);
+    tone(SPEAKER_PIN, NOTE_A6, 100);
 }
 
 /* LOOP()
@@ -32,23 +46,27 @@ void setup() {
  */
 void loop() {
 
-    int red  = digitalRead(RED_PIN);
-    int blue = digitalRead(BLUE_PIN);
+    int button_rev = digitalRead(BUTTON_PIN);
+    int horz       = analogRead(JOY_HORZ);
+    int vert       = analogRead(JOY_VERT);
 
-    int horz = analogRead(JOY_HORZ);
-    int vert = analogRead(JOY_VERT);
+    int button = 0;
+    if (button_rev == 0) button = 1;
+    else button = 0;
 
-    // DEBUG: button states
-    Serial.print("Red: ");
-    Serial.print(red);
-    Serial.print(" Blue: ");
-    Serial.print(blue);
+    // DEBUG: button/buzzer states
+    Serial.print("Button: ");
+    Serial.print(button);
 
     // DEBUG: joystick position
     Serial.print(" X: ");
     Serial.print(horz);
     Serial.print(" Y: ");
     Serial.println(vert);
-}
 
-void drawPixel(uint16_t x, uint16_t y, uint16_t color);
+    if (button && ) {
+        playSound();
+    }
+
+    int button_prev = button;
+}
