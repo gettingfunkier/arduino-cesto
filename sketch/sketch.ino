@@ -10,6 +10,9 @@ const int JOY_VERT = A1;
 const int MAX_WIDTH  = 128;
 const int MAX_HEIGHT = 64;
 
+const int SET   = 1;
+const int CLEAR = 0;
+
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
  * Used for config, like starting the display, or assigning pins as I/O.
@@ -47,3 +50,5 @@ void loop() {
     Serial.print(" Y: ");
     Serial.println(vert);
 }
+
+void drawPixel(uint16_t x, uint16_t y, uint16_t color);
