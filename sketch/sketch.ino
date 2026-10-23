@@ -7,6 +7,9 @@ const int BLUE_PIN = 3;
 const int JOY_HORZ = A0;
 const int JOY_VERT = A1;
 
+const int MAX_WIDTH  = 128;
+const int MAX_HEIGHT = 64;
+
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
  * Used for config, like starting the display, or assigning pins as I/O.
