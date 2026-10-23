@@ -1,3 +1,6 @@
+#include <Adafruit_GFH.h>
+#include <Adafruit_ST7789.h>
+
 const int RED_PIN  = 2;
 const int BLUE_PIN = 3;
 
