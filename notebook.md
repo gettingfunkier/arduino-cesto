@@ -5,7 +5,7 @@
 ### To-do
 
 - on wokwi:
-    - replace button 2 with a buzzer
+    - nothing :D
 
 - physical:
     - test arduino build

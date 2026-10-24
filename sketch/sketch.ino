@@ -20,8 +20,6 @@ const int CELL_H           = 22;
 const int BOX_W            = 30;
 const int BOX_H            = 20;
 
-Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
-
 // Player
 int playerHealth           = 6;
 const int HEALTH_UP        = 1;
@@ -42,6 +40,9 @@ int button_prev            = 0;
 int horz_prev              = 0;
 int vert_prev              = 0;
 
+Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
+bool revealed[GRID_COLS][GRID_ROWS];
+
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
  * Used for config, like starting the display, or assigning pins as I/O.
@@ -55,7 +56,7 @@ void setup() {
     pinMode(SPEAKER_PIN, OUTPUT);
     
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-    display.display();
+    startLevel();
 }
 
 int parseJoystickX(int horz) {
@@ -75,7 +76,9 @@ void drawGrid() {
         for (int row = 0; row < GRID_ROWS; row++) {
             int x = col * CELL_W;
             int y = row * CELL_H;
-            display.drawRect(x, y, BOX_W, BOX_H, SET);
+
+            if (!revealed[col][row]) display.drawRect(x, y, BOX_W, BOX_H, SET);
+            else display.fillRect(x, y, BOX_W, BOX_H, SET);
         }
     }
 }
@@ -83,7 +86,7 @@ void drawGrid() {
 void drawCursor() {
     int x = cursorCol * CELL_W + CURSOR_INSET;
     int y = cursorRow * CELL_H + CURSOR_INSET;
-    display.drawRect(x, y, CURSOR_W, CURSOR_H, SET);
+    display.drawRect(x, y, CURSOR_W, CURSOR_H, SSD1306_INVERSE);
 }
 
 void moveCursor(int horz, int vert) {
@@ -123,6 +126,25 @@ void drawHUD() {
     display.print(doorsOpened);
     display.print("|");
     display.print(DOORS_REQUIRED);
+}
+
+void startLevel() {
+    for (int col = 0; col < GRID_COLS; col++) {
+        for (int row = 0; row < GRID_ROWS; row++) {
+            revealed[col][row] = false;
+        }
+    }
+
+    doorsOpened = 0;
+    cursorCol   = 0;
+    cursorRow   = 0;
+}
+
+void revealCell() {
+    if (!revealed[cursorCol][cursorRow]) {
+        revealed[cursorCol][cursorRow] = true;
+        doorsOpened++;
+    }
 }
 
 void playSound() {
@@ -165,7 +187,7 @@ void debug(int button, int horz, int vert) {
  */
 void loop() {
 
-    // INPUT HANDLING
+    // --- INPUT HANDLING ---
     int button_raw = digitalRead(BUTTON_PIN);
     int horz       = parseJoystickX(analogRead(JOY_HORZ));
     int vert       = parseJoystickY(analogRead(JOY_VERT));
@@ -176,23 +198,19 @@ void loop() {
 
     debug(button, horz, vert);
 
-    // UPDATE
+    // --- UPDATE GAME ---
     moveCursor(horz, vert);
-
-    // DRAW
-    if (button && horz && !button_prev) {
-        playDeath();
+    
+    if (button && !button_prev) {
+        revealCell();
     }
+    
+    button_prev = button;
 
-    else if (button && !button_prev) {
-        playSound();
-    }
-
+    // --- DRAW DISPLAY ---
     display.clearDisplay();
     drawHUD();
     drawGrid();
     drawCursor();
     display.display();
-
-    button_prev = button;
 }
