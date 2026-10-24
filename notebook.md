@@ -4,6 +4,15 @@
 
 ### To-do
 
+- level complete
+- enemy placement
+- enemy trigger
+- game states
+- timer implementation
+- drawing enemies
+- game over
+- sound
+
 - on wokwi:
     - nothing :D
 
