@@ -8,36 +8,39 @@
 #define JOY_HORZ    A0
 #define JOY_VERT    A1
 
-const int MAX_WIDTH    = 128;
-const int MAX_HEIGHT   = 64;
-const int SET          = 1;
-const int CLEAR        = 0;
+const int MAX_WIDTH        = 128;
+const int MAX_HEIGHT       = 64;
+const int SET              = 1;
+const int CLEAR            = 0;
 
-const int GRID_COLS    = 3;
-const int GRID_ROWS    = 3;
-const int CELL_W       = 32;
-const int CELL_H       = 22;
-const int BOX_W        = 30;
-const int BOX_H        = 20;
+const int GRID_COLS        = 3;
+const int GRID_ROWS        = 3;
+const int CELL_W           = 32;
+const int CELL_H           = 22;
+const int BOX_W            = 30;
+const int BOX_H            = 20;
 
 Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
 
-// player and door variables
-int playerHealth       = 6;
-int healthUp           = 1;
-int damageReceived     = 1;
-int doorsOpened        = 4;
+// Player
+int playerHealth           = 6;
+const int HEALTH_UP        = 1;
+const int DAMAGE_RECEIVED  = 1;
+
+// Door
+const int DOORS_REQUIRED   = 4;
+int doorsOpened            = 0;
 
 // For following the current selected cell + knowing which cell will be randomized: 
-const int CURSOR_W     = BOX_W - 2;
-const int CURSOR_H     = BOX_H - 2;
-const int CURSOR_INSET = 1;
-int cursorCol          = 0;
-int cursorRow          = 0;
+const int CURSOR_W         = BOX_W - 2;
+const int CURSOR_H         = BOX_H - 2;
+const int CURSOR_INSET     = 1;
+int cursorCol              = 0;
+int cursorRow              = 0;
 
-int button_prev        = 0;
-int horz_prev          = 0;
-int vert_prev          = 0;
+int button_prev            = 0;
+int horz_prev              = 0;
+int vert_prev              = 0;
 
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
@@ -100,6 +103,26 @@ void moveCursor(int horz, int vert) {
 
     horz_prev = horz;
     vert_prev = vert;
+}
+
+void drawHUD() {
+    // Draw player health
+    display.setCursor(98, 4);
+    display.setTextSize(2);
+    display.setTextColor(SET);
+    display.print(playerHealth);
+
+    // Draw HP label
+    display.setCursor(97, 23);
+    display.setTextSize(1);
+    display.print("HP");
+
+    // Draw door information
+    display.setCursor(98, 47);
+    display.setTextSize(1);
+    display.print(doorsOpened);
+    display.print("|");
+    display.print(DOORS_REQUIRED);
 }
 
 void playSound() {
@@ -166,6 +189,7 @@ void loop() {
     }
 
     display.clearDisplay();
+    drawHUD();
     drawGrid();
     drawCursor();
     display.display();

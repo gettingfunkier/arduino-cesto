@@ -19,6 +19,7 @@ arduino-cesto/
 ### Achievements:
 
 - Reading button and joystick inputs
+- Working grid and cursor
 
 ### Happening now:
 
