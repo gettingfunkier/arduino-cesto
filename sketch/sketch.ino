@@ -8,17 +8,23 @@
 #define JOY_HORZ    A0
 #define JOY_VERT    A1
 
+// Display
 const int MAX_WIDTH        = 128;
 const int MAX_HEIGHT       = 64;
 const int SET              = 1;
 const int CLEAR            = 0;
 
+Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
+
+// Grids
 const int GRID_COLS        = 3;
 const int GRID_ROWS        = 3;
 const int CELL_W           = 32;
 const int CELL_H           = 22;
 const int BOX_W            = 30;
 const int BOX_H            = 20;
+
+bool revealed[GRID_COLS][GRID_ROWS];
 
 // Player
 int playerHealth           = 6;
@@ -29,19 +35,18 @@ const int DAMAGE_RECEIVED  = 1;
 const int DOORS_REQUIRED   = 4;
 int doorsOpened            = 0;
 
-// For following the current selected cell + knowing which cell will be randomized: 
+// Cursor
 const int CURSOR_W         = BOX_W - 2;
 const int CURSOR_H         = BOX_H - 2;
 const int CURSOR_INSET     = 1;
 int cursorCol              = 0;
 int cursorRow              = 0;
 
+// Edge detection
 int button_prev            = 0;
 int horz_prev              = 0;
 int vert_prev              = 0;
 
-Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
-bool revealed[GRID_COLS][GRID_ROWS];
 
 /* SETUP()
  * Function that runs once, when the board gets power or resets.
@@ -59,6 +64,10 @@ void setup() {
     startLevel();
 }
 
+/* PARSEJOYSTICK() - x and y
+ * Function pair that turns raw joystick inputs to readable values.
+ * Each need their respective cardinal input as a integer parameter.
+ */
 int parseJoystickX(int horz) {
     if (horz < 200) return 1;
     else if (horz > 800) return -1;
@@ -71,24 +80,37 @@ int parseJoystickY(int vert) {
     else return 0;
 }
 
+/* REVEALCELL()
+ * Function that handles the mechanic of revealing a cell.
+ * Updates selected cell as revealed, and increments number of open doors by 1.
+ */
+void revealCell() {
+    if (!revealed[cursorCol][cursorRow]) {
+        revealed[cursorCol][cursorRow] = true;
+        doorsOpened++;
+    }
+}
+
+/* DRAWGRID()
+ * Function that draws the game's grids.
+ * Automatically checks whether a grid has been revealed (hollow) or not (full).
+ */
 void drawGrid() {
     for (int col = 0; col < GRID_COLS; col++) {
         for (int row = 0; row < GRID_ROWS; row++) {
             int x = col * CELL_W;
             int y = row * CELL_H;
 
-            if (!revealed[col][row]) display.drawRect(x, y, BOX_W, BOX_H, SET);
+            if (revealed[col][row]) display.drawRect(x, y, BOX_W, BOX_H, SET);
             else display.fillRect(x, y, BOX_W, BOX_H, SET);
         }
     }
 }
 
-void drawCursor() {
-    int x = cursorCol * CELL_W + CURSOR_INSET;
-    int y = cursorRow * CELL_H + CURSOR_INSET;
-    display.drawRect(x, y, CURSOR_W, CURSOR_H, SSD1306_INVERSE);
-}
-
+/* MOVECURSOR()
+ * Function that updates the cursor's current position.
+ * Needs both cardinal joystick values as integer parameters.
+ */
 void moveCursor(int horz, int vert) {
     if (horz && !horz_prev) {
         int newCol = cursorCol + horz;
@@ -108,6 +130,21 @@ void moveCursor(int horz, int vert) {
     vert_prev = vert;
 }
 
+/* DRAWCURSOR()
+ * Function that draws the cursor in its current position.
+ */
+void drawCursor() {
+    int x = cursorCol * CELL_W + CURSOR_INSET;
+    int y = cursorRow * CELL_H + CURSOR_INSET;
+    display.drawRect(x, y, CURSOR_W, CURSOR_H, SSD1306_INVERSE);
+}
+
+/* DRAWHUD()
+ * Function that draws the game's HUD, including:
+ *      - Player health;
+ *      - HP label;
+ *      - Door information;
+ */
 void drawHUD() {
     // Draw player health
     display.setCursor(98, 4);
@@ -128,6 +165,13 @@ void drawHUD() {
     display.print(DOORS_REQUIRED);
 }
 
+/* STARTLEVEL()
+ * Function that sets game parameters to a new level, by resetting:
+ *      - All revealed cells to false;
+ *      - Number of open doors;
+ *      - Cursor position to (0,0);
+ *      
+ */
 void startLevel() {
     for (int col = 0; col < GRID_COLS; col++) {
         for (int row = 0; row < GRID_ROWS; row++) {
@@ -140,14 +184,15 @@ void startLevel() {
     cursorRow   = 0;
 }
 
-void revealCell() {
-    if (!revealed[cursorCol][cursorRow]) {
-        revealed[cursorCol][cursorRow] = true;
-        doorsOpened++;
-    }
+/* LEVELCOMPLETE()
+ * --- not defined yet ---
+ */
+void levelComplete() {
+    playWin();
+    startLevel();
 }
 
-void playSound() {
+void playWin() {
 }
 
 void playDeath() {
@@ -169,6 +214,9 @@ void playDeath() {
     noTone(SPEAKER_PIN);
 }
 
+/* DEBUG()
+ * Utility function to debug code.
+ */
 void debug(int button, int horz, int vert) {
     // DEBUG: button state
     Serial.print("Button: ");
