@@ -29,9 +29,9 @@ const int BOX_H            = 20;
 bool revealed[GRID_COLS][GRID_ROWS];
 
 // PLAYER
-int playerHealth           = 6;
 const int HEALTH_UP        = 2;
 const int DAMAGE_RECEIVED  = 1;
+int playerHealth           = 6;
 
 // ENEMY
 const int ENEMY_INSET_X    = 6;
@@ -54,9 +54,12 @@ int cursorCol              = 0;
 int cursorRow              = 0;
 
 // EDGE DETECTION
-int button_prev            = 0;
-int horz_prev              = 0;
-int vert_prev              = 0;
+int buttonPrev            = 0;
+int horzPrev              = 0;
+int vertPrev              = 0;
+
+// GAME STATE
+int currStage;
 
 
 /* SETUP()
@@ -145,24 +148,24 @@ void drawGrid() {
  * Needs both cardinal joystick values as integer parameters.
  */
 void moveCursor(int horz, int vert) {
-    if (horz && !horz_prev) {
+    if (horz && !horzPrev) {
         int newCol = cursorCol + horz;
         if (newCol >= 0 && newCol <= GRID_COLS - 1) {
             cursorCol = newCol;
         }
     }
 
-    if (vert && !vert_prev) {
+    if (vert && !vertPrev) {
         int newRow = cursorRow + vert;
         if (newRow >= 0 && newRow <= GRID_ROWS - 1) {
             cursorRow = newRow;
         }
     }
 
-    if (horz != horz_prev || vert != vert_prev) playSelect();
+    if (horz != horzPrev || vert != vertPrev) playSelect();
 
-    horz_prev = horz;
-    vert_prev = vert;
+    horzPrev = horz;
+    vertPrev = vert;
 }
 
 /* DRAWCURSOR()
@@ -233,13 +236,14 @@ void startLevel() {
     doorsOpened = 0;
     cursorCol   = 0;
     cursorRow   = 0;
+    currEnemy   = 0;
 }
 
 /* LEVELCOMPLETE()
  * --- not defined yet ---
  */
 void levelComplete() {
-    playWin();
+    delay(500);
     startLevel();
 }
 
@@ -304,11 +308,11 @@ void loop() {
     // --- UPDATE GAME ---
     moveCursor(horz, vert);
     
-    if (button && !button_prev) {
+    if (button && !buttonPrev) {
         revealCell();
     }
     
-    button_prev = button;
+    buttonPrev = button;
 
     // --- DRAW DISPLAY ---
     display.clearDisplay();
@@ -317,4 +321,7 @@ void loop() {
     drawCursor();
     drawEnemies();
     display.display();
+
+    // --- RESET STAGE ---
+    if (doorsOpened == DOORS_REQUIRED) levelComplete();
 }
