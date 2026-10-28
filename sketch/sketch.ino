@@ -36,9 +36,11 @@ const int DAMAGE_RECEIVED  = 1;
 // ENEMY
 const int ENEMY_INSET_X    = 6;
 const int ENEMY_INSET_Y    = 7;
-int enemyCol               = 0;
-int enemyRow               = 0;
-int enemyFound             = 0;
+const int MAX_ENEMIES      = 3;
+int currEnemy              = 0;
+int enemyCol[3]            = {0};
+int enemyRow[3]            = {0};
+bool enemyFound[3];
 
 // DOOR
 const int DOORS_REQUIRED   = 4;
@@ -90,13 +92,23 @@ int parseJoystickY(int vert) {
     else return 0;
 }
 
+bool allEnemiesFound() {
+    int ef = 0;
+    for (int e = 0; e < MAX_ENEMIES; e++) {
+        if (enemyFound[e]) ef++;
+    }
+    return ef == MAX_ENEMIES;
+}
+
 void assignEnemy() {
     randomNum = random(3);
-    if (randomNum == 1 && !enemyFound) {
-        enemyFound++;
+    if (randomNum == 1 && !allEnemiesFound()) {
+        enemyFound[currEnemy] = true;
+        enemyCol[currEnemy] = cursorCol;
+        enemyRow[currEnemy] = cursorRow;
+
         playerHealth--;
-        enemyCol = cursorCol * CELL_W + ENEMY_INSET_X;
-        enemyRow = cursorRow * CELL_H + ENEMY_INSET_Y;
+        currEnemy++;
     }
 }
 
@@ -188,10 +200,15 @@ void drawHUD() {
     display.print(DOORS_REQUIRED);
 }
 
-void drawEnemy() {
-    if (enemyFound) {
-        display.setCursor(enemyCol, enemyRow);
+void drawEnemies() {
+    int e = 0;
+    while (enemyFound[e]) {
+        display.setCursor(
+            enemyCol[e] * CELL_W + ENEMY_INSET_X, 
+            enemyRow[e] * CELL_H + ENEMY_INSET_Y
+        );
         display.print("^~^");
+        e++;
     }
 }
 
@@ -207,6 +224,10 @@ void startLevel() {
         for (int row = 0; row < GRID_ROWS; row++) {
             revealed[col][row] = false;
         }
+    }
+
+    for (int enemy = 0; enemy < MAX_ENEMIES; enemy++) {
+        enemyFound[enemy] = false;
     }
 
     doorsOpened = 0;
@@ -251,7 +272,7 @@ void playDeath() {
 /* DEBUG()
  * Utility function to debug code.
  */
-void debug(int button, int horz, int vert, int found) {
+void debug(int button, int horz, int vert) {
     // DEBUG: button state
     Serial.print("Button: ");
     Serial.print(button);
@@ -260,11 +281,7 @@ void debug(int button, int horz, int vert, int found) {
     Serial.print(" X: ");
     Serial.print(horz);
     Serial.print(" Y: ");
-    Serial.print(vert);
-
-    // DEBUG: enemy found
-    if (found) Serial.println(" Enemy found!");
-    else Serial.println();
+    Serial.println(vert);
 }
 
 /* LOOP()
@@ -282,7 +299,7 @@ void loop() {
     if (button_raw == 0) { button = 1;
     } else button = 0;
 
-    debug(button, horz, vert, enemyFound);
+    debug(button, horz, vert);
 
     // --- UPDATE GAME ---
     moveCursor(horz, vert);
@@ -298,6 +315,6 @@ void loop() {
     drawHUD();
     drawGrid();
     drawCursor();
-    drawEnemy();
+    drawEnemies();
     display.display();
 }
