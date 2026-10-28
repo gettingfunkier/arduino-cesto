@@ -94,6 +94,7 @@ void assignEnemy() {
     randomNum = random(3);
     if (randomNum == 1) {
         enemyFound++;
+        playerHealth--;
         enemyCol = cursorCol * CELL_W + ENEMY_INSET_X;
         enemyRow = cursorRow * CELL_H + ENEMY_INSET_Y;
     }
