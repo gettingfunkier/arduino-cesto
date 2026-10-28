@@ -20,3 +20,4 @@
 
 - Some sort of customization
 - 1 Health boost on every level
+- First grid of each game reveals from left to right

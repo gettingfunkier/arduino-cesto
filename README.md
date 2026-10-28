@@ -9,7 +9,7 @@ arduino-cesto/
 │
 ├─ sketch/            # GAME FILES
 │   ├── diagram.json  # WOKWI SIMULATION
-│   ├── pitches.h     # MUSIC NOTE DEF.
+│   ├── pitches.h     # DEF. MUSIC NOTE
 │   └── sketch.ino    # ARDUINO CODE
 │
 ├─ .gitignore         # UNTRACKED FILES
@@ -23,7 +23,5 @@ arduino-cesto/
 - Working grid and cursor
 - Printing HUD
 - Revealing cells
-
-### Happening now:
-
-- nothing :D
+- Enemy decreases player health when encountered (1/4 chance)
+- Increments stage after required doors opened
