@@ -34,11 +34,11 @@ const int HEALTH_UP        = 2;
 const int DAMAGE_RECEIVED  = 1;
 
 // ENEMY
+const int ENEMY_INSET_X    = 6;
+const int ENEMY_INSET_Y    = 7;
 int enemyCol               = 0;
 int enemyRow               = 0;
 int enemyFound             = 0;
-const int ENEMY_INSET_X    = 6;
-const int ENEMY_INSET_Y    = 7;
 
 // DOOR
 const int DOORS_REQUIRED   = 4;
@@ -92,7 +92,7 @@ int parseJoystickY(int vert) {
 
 void assignEnemy() {
     randomNum = random(3);
-    if (randomNum == 1) {
+    if (randomNum == 1 && !enemyFound) {
         enemyFound++;
         playerHealth--;
         enemyCol = cursorCol * CELL_W + ENEMY_INSET_X;
