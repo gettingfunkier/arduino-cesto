@@ -5,11 +5,8 @@
 ### To-do
 
 - level complete
-- enemy placement
-- enemy trigger
 - game states
-- timer implementation
-- drawing enemies
+- drawing enemies X
 - game over
 - sound
 
@@ -22,4 +19,4 @@
 ### Ideas
 
 - Some sort of customization
-- Hello
+- 1 Health boost on every level
