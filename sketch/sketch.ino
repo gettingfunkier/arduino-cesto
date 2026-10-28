@@ -1,5 +1,4 @@
 #include "pitches.h"
-#include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
@@ -7,8 +6,11 @@
 #define SPEAKER_PIN 3
 #define JOY_HORZ    A0
 #define JOY_VERT    A1
+#define RANDOM_PIN  A2
 
-// Display
+long randomNum;
+
+// DISPLAY
 const int MAX_WIDTH        = 128;
 const int MAX_HEIGHT       = 64;
 const int SET              = 1;
@@ -16,7 +18,7 @@ const int CLEAR            = 0;
 
 Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
 
-// Grids
+// GRIDS
 const int GRID_COLS        = 3;
 const int GRID_ROWS        = 3;
 const int CELL_W           = 32;
@@ -26,23 +28,30 @@ const int BOX_H            = 20;
 
 bool revealed[GRID_COLS][GRID_ROWS];
 
-// Player
+// PLAYER
 int playerHealth           = 6;
-const int HEALTH_UP        = 1;
+const int HEALTH_UP        = 2;
 const int DAMAGE_RECEIVED  = 1;
 
-// Door
+// ENEMY
+int enemyCol               = 0;
+int enemyRow               = 0;
+int enemyFound             = 0;
+const int ENEMY_INSET_X    = 6;
+const int ENEMY_INSET_Y    = 7;
+
+// DOOR
 const int DOORS_REQUIRED   = 4;
 int doorsOpened            = 0;
 
-// Cursor
+// CURSOR
 const int CURSOR_W         = BOX_W - 2;
 const int CURSOR_H         = BOX_H - 2;
 const int CURSOR_INSET     = 1;
 int cursorCol              = 0;
 int cursorRow              = 0;
 
-// Edge detection
+// EDGE DETECTION
 int button_prev            = 0;
 int horz_prev              = 0;
 int vert_prev              = 0;
@@ -55,6 +64,7 @@ int vert_prev              = 0;
 void setup() {
 
     Serial.begin(9600);
+    randomSeed(analogRead(RANDOM_PIN));
     
     // make input 2 button and output 3 speaker
     pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -80,6 +90,15 @@ int parseJoystickY(int vert) {
     else return 0;
 }
 
+void assignEnemy() {
+    randomNum = random(3);
+    if (randomNum == 1) {
+        enemyFound++;
+        enemyCol = cursorCol * CELL_W + ENEMY_INSET_X;
+        enemyRow = cursorRow * CELL_H + ENEMY_INSET_Y;
+    }
+}
+
 /* REVEALCELL()
  * Function that handles the mechanic of revealing a cell.
  * Updates selected cell as revealed, and increments number of open doors by 1.
@@ -88,6 +107,7 @@ void revealCell() {
     if (!revealed[cursorCol][cursorRow]) {
         revealed[cursorCol][cursorRow] = true;
         doorsOpened++;
+        assignEnemy();
     }
 }
 
@@ -125,6 +145,8 @@ void moveCursor(int horz, int vert) {
             cursorRow = newRow;
         }
     }
+
+    if (horz != horz_prev || vert != vert_prev) playSelect();
 
     horz_prev = horz;
     vert_prev = vert;
@@ -165,6 +187,13 @@ void drawHUD() {
     display.print(DOORS_REQUIRED);
 }
 
+void drawEnemy() {
+    if (enemyFound) {
+        display.setCursor(enemyCol, enemyRow);
+        display.print("^~^");
+    }
+}
+
 /* STARTLEVEL()
  * Function that sets game parameters to a new level, by resetting:
  *      - All revealed cells to false;
@@ -192,6 +221,10 @@ void levelComplete() {
     startLevel();
 }
 
+void playSelect() {
+  tone(SPEAKER_PIN, NOTE_C5, 30);
+}
+
 void playWin() {
 }
 
@@ -217,7 +250,7 @@ void playDeath() {
 /* DEBUG()
  * Utility function to debug code.
  */
-void debug(int button, int horz, int vert) {
+void debug(int button, int horz, int vert, int found) {
     // DEBUG: button state
     Serial.print("Button: ");
     Serial.print(button);
@@ -226,7 +259,11 @@ void debug(int button, int horz, int vert) {
     Serial.print(" X: ");
     Serial.print(horz);
     Serial.print(" Y: ");
-    Serial.println(vert);
+    Serial.print(vert);
+
+    // DEBUG: enemy found
+    if (found) Serial.println(" Enemy found!");
+    else Serial.println();
 }
 
 /* LOOP()
@@ -244,7 +281,7 @@ void loop() {
     if (button_raw == 0) { button = 1;
     } else button = 0;
 
-    debug(button, horz, vert);
+    debug(button, horz, vert, enemyFound);
 
     // --- UPDATE GAME ---
     moveCursor(horz, vert);
@@ -260,5 +297,6 @@ void loop() {
     drawHUD();
     drawGrid();
     drawCursor();
+    drawEnemy();
     display.display();
 }
