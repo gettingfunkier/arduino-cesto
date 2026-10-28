@@ -300,7 +300,7 @@ void drawHUD() {
  */
 void drawEnemies() {
     int e = 0;
-    while (enemyFound[e]) {
+    while (enemyFound[e] && e < MAX_ENEMIES) {
         display.setTextSize(1);
         display.setCursor(
             enemyCol[e] * CELL_W + ENEMY_INSET_X, 
