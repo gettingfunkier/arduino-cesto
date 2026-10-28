@@ -8,7 +8,6 @@
 #define JOY_VERT    A1
 #define RANDOM_PIN  A2
 
-long randomNum;
 
 // DISPLAY
 const int MAX_WIDTH        = 128;
@@ -104,8 +103,7 @@ bool allEnemiesFound() {
 }
 
 void assignEnemy() {
-    randomNum = random(3);
-    if (randomNum == 1 && !allEnemiesFound()) {
+    if (random(3) == 1 && !allEnemiesFound()) {
         enemyFound[currEnemy] = true;
         enemyCol[currEnemy] = cursorCol;
         enemyRow[currEnemy] = cursorRow;
@@ -124,6 +122,7 @@ void revealCell() {
         revealed[cursorCol][cursorRow] = true;
         doorsOpened++;
         assignEnemy();
+        playSelect();
     }
 }
 
@@ -161,8 +160,6 @@ void moveCursor(int horz, int vert) {
             cursorRow = newRow;
         }
     }
-
-    if (horz != horzPrev || vert != vertPrev) playSelect();
 
     horzPrev = horz;
     vertPrev = vert;
@@ -252,26 +249,30 @@ void playSelect() {
   tone(SPEAKER_PIN, NOTE_C5, 30);
 }
 
-void playWin() {
-}
-
-void playDeath() {
-    int pitch_main = NOTE_C7;
-
-    for (int i = 0; i < 5; i++) {
-        tone(SPEAKER_PIN, pitch_main);
-        pitch_main -= 50;
-        delay(250);
-    }
-
-    for (byte i = 0; i < 10; i++) {
-        for (int pitch = -10; pitch <= 10; pitch++) {
-            tone(SPEAKER_PIN, NOTE_C5 + pitch);
-            delay(5);
-        }
-    }
-
+void playGameOver() {
+    tone(SPEAKER_PIN, NOTE_GS5, 50);
     noTone(SPEAKER_PIN);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_G5, 50);
+    noTone(SPEAKER_PIN);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_FS5, 50);
+    noTone(SPEAKER_PIN);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_F5, 50);
+    noTone(SPEAKER_PIN);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_E5, 50);
+    noTone(SPEAKER_PIN);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_DS5, 1000);
+    noTone(SPEAKER_PIN);
+    delay(250);
 }
 
 void gameOver() {
@@ -285,7 +286,7 @@ void gameOver() {
     display.setTextSize(1);
     display.print("GAME OVER");
     display.display();
-    delay(2000);
+    playGameOver();
 
     display.clearDisplay();
     display.display();
