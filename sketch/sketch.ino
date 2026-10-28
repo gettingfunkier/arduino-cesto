@@ -206,6 +206,7 @@ void drawHUD() {
 void drawEnemies() {
     int e = 0;
     while (enemyFound[e]) {
+        display.setTextSize(1);
         display.setCursor(
             enemyCol[e] * CELL_W + ENEMY_INSET_X, 
             enemyRow[e] * CELL_H + ENEMY_INSET_Y
