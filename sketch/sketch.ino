@@ -14,7 +14,6 @@ const int MAX_WIDTH        = 128;
 const int MAX_HEIGHT       = 64;
 const int SET              = 1;
 const int CLEAR            = 0;
-
 Adafruit_SSD1306 display = Adafruit_SSD1306(MAX_WIDTH, MAX_HEIGHT, &Wire);
 
 // GRIDS
@@ -24,7 +23,6 @@ const int CELL_W           = 32;
 const int CELL_H           = 22;
 const int BOX_W            = 30;
 const int BOX_H            = 20;
-
 bool revealed[GRID_COLS][GRID_ROWS];
 
 //HEALING
@@ -101,61 +99,13 @@ int parseJoystickY(int vert) {
     else return 0;
 }
 
-bool allEnemiesFound() {
-    int ef = 0;
-    for (int e = 0; e < MAX_ENEMIES; e++) {
-        if (enemyFound[e]) ef++;
-    }
-    return ef == MAX_ENEMIES;
-}
-
-void assignCell() {
-    randNum = random(9);
-    if (randNum < 3 && !allEnemiesFound()) {
-        enemyFound[currEnemy] = true;
-        enemyCol[currEnemy] = cursorCol;
-        enemyRow[currEnemy] = cursorRow;
-
-        playerHealth--;
-        currEnemy++;
-    }
-
-    else if (randNum > 6 && !healthFound) {
-        healthFound = true;
-        healthCol = cursorCol;
-        healthRow = cursorRow;
-        playerHealth += HEALTH_UP;
-        if(playerHealth > 6) playerHealth = 6;
-    }
-}
-
-/* REVEALCELL()
- * Function that handles the mechanic of revealing a cell.
- * Updates selected cell as revealed, and increments number of open doors by 1.
+/* DRAWCURSOR()
+ * Function that draws the cursor in its current position.
  */
-void revealCell() {
-    if (!revealed[cursorCol][cursorRow]) {
-        revealed[cursorCol][cursorRow] = true;
-        doorsOpened++;
-        assignCell();
-        playSelect();
-    }
-}
-
-/* DRAWGRID()
- * Function that draws the game's grids.
- * Automatically checks whether a grid has been revealed (hollow) or not (full).
- */
-void drawGrid() {
-    for (int col = 0; col < GRID_COLS; col++) {
-        for (int row = 0; row < GRID_ROWS; row++) {
-            int x = col * CELL_W;
-            int y = row * CELL_H;
-
-            if (revealed[col][row]) display.drawRect(x, y, BOX_W, BOX_H, SET);
-            else display.fillRect(x, y, BOX_W, BOX_H, SET);
-        }
-    }
+void drawCursor() {
+    int x = cursorCol * CELL_W + CURSOR_INSET;
+    int y = cursorRow * CELL_H + CURSOR_INSET;
+    display.drawRect(x, y, CURSOR_W, CURSOR_H, SSD1306_INVERSE);
 }
 
 /* MOVECURSOR()
@@ -181,76 +131,60 @@ void moveCursor(int horz, int vert) {
     vertPrev = vert;
 }
 
-/* DRAWCURSOR()
- * Function that draws the cursor in its current position.
- */
-void drawCursor() {
-    int x = cursorCol * CELL_W + CURSOR_INSET;
-    int y = cursorRow * CELL_H + CURSOR_INSET;
-    display.drawRect(x, y, CURSOR_W, CURSOR_H, SSD1306_INVERSE);
-}
-
-/* DRAWHUD()
- * Function that draws the game's HUD, including:
- *      - Player health;
- *      - HP label;
- *      - Door information;
- */
-void drawHUD() {
-    // Draw player health
-    display.setCursor(98, 4);
-    display.setTextSize(2);
-    display.setTextColor(SET);
-    display.print(playerHealth);
-
-    // Draw HP label
-    display.setCursor(112, 4);
-    display.setTextSize(1);
-    display.print("HP");
-
-    // Draw current stage
-
-    // Draw door information
-    display.setCursor(98, 47);
-    display.setTextSize(1);
-    display.print(doorsOpened);
-    display.print("|");
-    display.print(DOORS_REQUIRED);
-}
-
-void drawEnemies() {
-    int e = 0;
-    while (enemyFound[e]) {
-        display.setTextSize(1);
-        display.setCursor(
-            enemyCol[e] * CELL_W + ENEMY_INSET_X, 
-            enemyRow[e] * CELL_H + ENEMY_INSET_Y
-        );
-        display.print("^~^");
-        e++;
+/* ASSIGNCELL()
+* Function that handles cell selection.
+* 1/3 chance for cell to be an enemy (max 3 enemies).
+* 1/4 chance for cell to be a health boost (max 1 health boost).
+*/
+void assignCell() {
+    randNum = random(9);
+    if (randNum < 3 && !allEnemiesFound()) {
+        enemyFound[currEnemy] = true;
+        enemyCol[currEnemy] = cursorCol;
+        enemyRow[currEnemy] = cursorRow;
+        
+        playerHealth--;
+        currEnemy++;
+    }
+    
+    else if (randNum > 6 && !healthFound) {
+        healthFound = true;
+        healthCol = cursorCol;
+        healthRow = cursorRow;
+        playerHealth += HEALTH_UP;
+        if(playerHealth > 6) playerHealth = 6;
     }
 }
 
-void drawHealth() {
-
-    if(healthFound) {
-        display.setTextSize(2);
-        display.setCursor(
-            healthCol * CELL_W + HEALTH_INSET_X,
-            healthRow * CELL_H + HEALTH_INSET_Y 
-        );
-        display.print("+");
+/* REVEALCELL()
+* Function that handles the mechanic of revealing a cell.
+* Updates selected cell as revealed, and increments number of open doors by 1.
+*/
+void revealCell() {
+    if (!revealed[cursorCol][cursorRow]) {
+        revealed[cursorCol][cursorRow] = true;
+        doorsOpened++;
+        assignCell();
+        playSelect();
     }
 }
 
-
+/* ALLENEMIESFOUND()
+ * Function that returns whether all enemies have been found.
+ */
+bool allEnemiesFound() {
+    int ef = 0;
+    for (int e = 0; e < MAX_ENEMIES; e++) {
+        if (enemyFound[e]) ef++;
+    }
+    return ef == MAX_ENEMIES;
+}
 
 /* STARTLEVEL()
  * Function that sets game parameters to a new level, by resetting:
  *      - All revealed cells to false;
  *      - Number of open doors;
  *      - Cursor position to (0,0);
- *      
  */
 void startLevel() {
     for (int col = 0; col < GRID_COLS; col++) {
@@ -271,37 +205,20 @@ void startLevel() {
 }
 
 /* LEVELCOMPLETE()
- * --- not defined yet ---
+ * Function that handles level completion and transition.
  */
 void levelComplete() {
     delay(500);
     startLevel();
 }
 
-void playSelect() {
-  tone(SPEAKER_PIN, NOTE_C5, 30);
-}
-
-void playGameOver() {
-    tone(SPEAKER_PIN, NOTE_GS5, 50);
-    delay(250);
-
-    tone(SPEAKER_PIN, NOTE_G5, 50);
-    delay(250);
-
-    tone(SPEAKER_PIN, NOTE_FS5, 50);
-    delay(250);
-
-    tone(SPEAKER_PIN, NOTE_F5, 50);
-    delay(250);
-
-    tone(SPEAKER_PIN, NOTE_E5, 50);
-    delay(250);
-
-    tone(SPEAKER_PIN, NOTE_DS5, 1000);
-    delay(250);
-}
-
+/* GAMEOVER()
+ * Function that handles game over by:
+ *      - Updating high score;
+ *      - Resetting game variables;
+ *      - Displaying game over screen, and high score value;
+ *      - Restarting the game;
+ */
 void gameOver() {
     if (currStage > highScore) {
         highScore = currStage;
@@ -334,6 +251,109 @@ void gameOver() {
     startLevel();
 }
 
+/* DRAWGRID()
+ * Function that draws the game's grids.
+ * Automatically checks whether a grid has been revealed (hollow) or not (full).
+ */
+void drawGrid() {
+    for (int col = 0; col < GRID_COLS; col++) {
+        for (int row = 0; row < GRID_ROWS; row++) {
+            int x = col * CELL_W;
+            int y = row * CELL_H;
+
+            if (revealed[col][row]) display.drawRect(x, y, BOX_W, BOX_H, SET);
+            else display.fillRect(x, y, BOX_W, BOX_H, SET);
+        }
+    }
+}
+
+/* DRAWHUD()
+ * Function that draws the game's HUD, including:
+ *      - Player health;
+ *      - HP label;
+ *      - Door information;
+ */
+void drawHUD() {
+    // Draw player health
+    display.setCursor(98, 4);
+    display.setTextSize(2);
+    display.setTextColor(SET);
+    display.print(playerHealth);
+
+    // Draw HP label
+    display.setCursor(112, 4);
+    display.setTextSize(1);
+    display.print("HP");
+
+    // Draw current stage
+
+    // Draw door information
+    display.setCursor(98, 47);
+    display.setTextSize(1);
+    display.print(doorsOpened);
+    display.print("|");
+    display.print(DOORS_REQUIRED);
+}
+
+/* DRAWENEMIES()
+ * Function that draws an enemy on the previously determined enemy cell
+ */
+void drawEnemies() {
+    int e = 0;
+    while (enemyFound[e]) {
+        display.setTextSize(1);
+        display.setCursor(
+            enemyCol[e] * CELL_W + ENEMY_INSET_X, 
+            enemyRow[e] * CELL_H + ENEMY_INSET_Y
+        );
+        display.print("^~^");
+        e++;
+    }
+}
+
+/* DRAWHEALTH()
+ * Function that draws an health sign on the previously determined health cell
+ */
+void drawHealth() {
+    if(healthFound) {
+        display.setTextSize(2);
+        display.setCursor(
+            healthCol * CELL_W + HEALTH_INSET_X,
+            healthRow * CELL_H + HEALTH_INSET_Y 
+        );
+        display.print("+");
+    }
+}
+
+/* PLAYSELECT()
+ * Function that plays sound at cell selection.
+ */
+void playSelect() {
+  tone(SPEAKER_PIN, NOTE_C5, 30);
+}
+
+/* PLAYGAMEOVER()
+ * Function that plays sound at game over.
+ */
+void playGameOver() {
+    tone(SPEAKER_PIN, NOTE_GS5, 50);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_G5, 50);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_FS5, 50);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_F5, 50);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_E5, 50);
+    delay(250);
+
+    tone(SPEAKER_PIN, NOTE_DS5, 1000);
+    delay(250);
+}
 
 /* DEBUG()
  * Utility function to debug code.
