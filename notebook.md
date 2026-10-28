@@ -4,11 +4,12 @@
 
 ### To-do
 
-- level complete
-- game states
+- health boosts
+- level complete X
 - drawing enemies X
-- game over
+- game over X
 - sound
+- high score
 
 - on wokwi:
     - nothing :D

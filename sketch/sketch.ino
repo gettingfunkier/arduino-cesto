@@ -275,21 +275,22 @@ void playDeath() {
 }
 
 void gameOver() {
-    // clear display
-    display.clearDisplay();
-    // set currStage = 1;
-    currStage = 1;
-    //set health back to 6
     playerHealth = 6;
-    //set cursor col and row to 0
-    cursorCol = 0;
-    cursorRow = 0;
-    //drawing game over:
-    display.setCursor(33, 24);
+    currStage    = 1;
+    cursorCol    = 0;
+    cursorRow    = 0;
+    
+    display.clearDisplay();
+    display.setCursor(37, 24);
     display.setTextSize(1);
     display.print("GAME OVER");
-    delay(1500);
-    //call startlevel
+    display.display();
+    delay(2000);
+
+    display.clearDisplay();
+    display.display();
+    delay(1000);
+
     startLevel();
 }
 
