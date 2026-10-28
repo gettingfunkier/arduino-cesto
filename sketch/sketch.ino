@@ -274,6 +274,26 @@ void playDeath() {
     noTone(SPEAKER_PIN);
 }
 
+void gameOver() {
+    // clear display
+    display.clearDisplay();
+    // set currStage = 1;
+    currStage = 1;
+    //set health back to 6
+    playerHealth = 6;
+    //set cursor col and row to 0
+    cursorCol = 0;
+    cursorRow = 0;
+    //drawing game over:
+    display.setCursor(33, 24);
+    display.setTextSize(1);
+    display.print("GAME OVER");
+    delay(1500);
+    //call startlevel
+    startLevel();
+}
+
+
 /* DEBUG()
  * Utility function to debug code.
  */
@@ -323,6 +343,11 @@ void loop() {
     drawEnemies();
     display.display();
 
-    // --- RESET STAGE ---
-    if (doorsOpened == DOORS_REQUIRED) levelComplete();
+    // --- GAME STATES ---
+    if (doorsOpened == DOORS_REQUIRED) {
+        currStage++;
+        levelComplete();
+    }
+
+    if (playerHealth == 0) gameOver();
 }
