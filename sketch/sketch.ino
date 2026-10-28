@@ -58,6 +58,9 @@ int horzPrev              = 0;
 int vertPrev              = 0;
 
 // GAME STATE
+int randNum               = 0;
+bool isHighScore          = false;
+int highScore;
 int currStage;
 
 
@@ -102,14 +105,19 @@ bool allEnemiesFound() {
     return ef == MAX_ENEMIES;
 }
 
-void assignEnemy() {
-    if (random(3) == 1 && !allEnemiesFound()) {
+void assignCell() {
+    randNum = random(9);
+    if (randNum < 3 && !allEnemiesFound()) {
         enemyFound[currEnemy] = true;
         enemyCol[currEnemy] = cursorCol;
         enemyRow[currEnemy] = cursorRow;
 
         playerHealth--;
         currEnemy++;
+    }
+
+    else if (randNum == 4) {
+        // HEALTH STUFF
     }
 }
 
@@ -121,7 +129,7 @@ void revealCell() {
     if (!revealed[cursorCol][cursorRow]) {
         revealed[cursorCol][cursorRow] = true;
         doorsOpened++;
-        assignEnemy();
+        assignCell();
         playSelect();
     }
 }
@@ -188,9 +196,11 @@ void drawHUD() {
     display.print(playerHealth);
 
     // Draw HP label
-    display.setCursor(97, 23);
+    display.setCursor(112, 4);
     display.setTextSize(1);
     display.print("HP");
+
+    // Draw current stage
 
     // Draw door information
     display.setCursor(98, 47);
@@ -251,42 +261,48 @@ void playSelect() {
 
 void playGameOver() {
     tone(SPEAKER_PIN, NOTE_GS5, 50);
-    noTone(SPEAKER_PIN);
     delay(250);
 
     tone(SPEAKER_PIN, NOTE_G5, 50);
-    noTone(SPEAKER_PIN);
     delay(250);
 
     tone(SPEAKER_PIN, NOTE_FS5, 50);
-    noTone(SPEAKER_PIN);
     delay(250);
 
     tone(SPEAKER_PIN, NOTE_F5, 50);
-    noTone(SPEAKER_PIN);
     delay(250);
 
     tone(SPEAKER_PIN, NOTE_E5, 50);
-    noTone(SPEAKER_PIN);
     delay(250);
 
     tone(SPEAKER_PIN, NOTE_DS5, 1000);
-    noTone(SPEAKER_PIN);
     delay(250);
 }
 
 void gameOver() {
+    if (currStage > highScore) {
+        highScore = currStage;
+        isHighScore = true;
+    }
+
     playerHealth = 6;
     currStage    = 1;
     cursorCol    = 0;
     cursorRow    = 0;
     
     display.clearDisplay();
+    display.display();
+    delay(500);
     display.setCursor(37, 24);
     display.setTextSize(1);
     display.print("GAME OVER");
+
+    display.setCursor(25, 32);
+    display.print("High Score: ");
+    display.print(highScore);
     display.display();
     playGameOver();
+    delay(500);
 
     display.clearDisplay();
     display.display();
