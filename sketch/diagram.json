@@ -3,14 +3,7 @@
   "author": "Anonymous maker",
   "editor": "wokwi",
   "parts": [
-    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0, "left": 0, "attrs": {} },
-    {
-      "type": "wokwi-pushbutton",
-      "id": "btn1",
-      "top": -118.6,
-      "left": 105.6,
-      "attrs": { "color": "blue", "xray": "1" }
-    },
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 0.6, "left": -0.6, "attrs": {} },
     {
       "type": "wokwi-pushbutton",
       "id": "btn2",
@@ -31,21 +24,28 @@
       "top": -121.66,
       "left": 249.83,
       "attrs": { "i2cAddress": "0x3c" }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": -170.4,
+      "left": 174.6,
+      "attrs": { "volume": "0.1" }
     }
   ],
   "connections": [
     [ "oled1:GND", "uno:GND.2", "black", [ "v0" ] ],
-    [ "btn1:1.l", "uno:3", "white", [ "h0" ] ],
     [ "uno:2", "btn2:1.l", "white", [ "v0" ] ],
     [ "btn2:2.r", "uno:GND.3", "black", [ "h0" ] ],
-    [ "btn1:2.r", "uno:GND.3", "black", [ "h0" ] ],
     [ "oled1:VCC", "uno:5V", "red", [ "v0" ] ],
     [ "joystick1:HORZ", "uno:A0", "gold", [ "v0" ] ],
     [ "joystick1:VERT", "uno:A1", "gold", [ "v0" ] ],
     [ "joystick1:GND", "uno:GND.2", "black", [ "v0" ] ],
     [ "joystick1:VCC", "uno:5V", "red", [ "v0" ] ],
     [ "oled1:SDA", "uno:A4", "green", [ "v0" ] ],
-    [ "oled1:SCL", "uno:A5", "green", [ "v0" ] ]
+    [ "oled1:SCL", "uno:A5", "green", [ "v0" ] ],
+    [ "bz1:1", "uno:GND.2", "black", [ "v0" ] ],
+    [ "bz1:2", "uno:3", "green", [ "v0" ] ]
   ],
   "dependencies": {}
 }
