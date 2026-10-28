@@ -27,10 +27,14 @@ const int BOX_H            = 20;
 
 bool revealed[GRID_COLS][GRID_ROWS];
 
-// PLAYER
+//HEALING
 const int HEALTH_UP        = 2;
-const int DAMAGE_RECEIVED  = 1;
+const int HEALTH_INSET_X   = 10;
+const int HEALTH_INSET_Y   = 3;
 int playerHealth           = 6;
+int healthCol              = 0;
+int healthRow              = 0;
+bool healthFound;
 
 // ENEMY
 const int ENEMY_INSET_X    = 6;
@@ -116,8 +120,12 @@ void assignCell() {
         currEnemy++;
     }
 
-    else if (randNum == 4) {
-        // HEALTH STUFF
+    else if (randNum > 6 && !healthFound) {
+        healthFound = true;
+        healthCol = cursorCol;
+        healthRow = cursorRow;
+        playerHealth += HEALTH_UP;
+        if(playerHealth > 6) playerHealth = 6;
     }
 }
 
@@ -223,6 +231,20 @@ void drawEnemies() {
     }
 }
 
+void drawHealth() {
+
+    if(healthFound) {
+        display.setTextSize(2);
+        display.setCursor(
+            healthCol * CELL_W + HEALTH_INSET_X,
+            healthRow * CELL_H + HEALTH_INSET_Y 
+        );
+        display.print("+");
+    }
+}
+
+
+
 /* STARTLEVEL()
  * Function that sets game parameters to a new level, by resetting:
  *      - All revealed cells to false;
@@ -245,6 +267,7 @@ void startLevel() {
     cursorCol   = 0;
     cursorRow   = 0;
     currEnemy   = 0;
+    healthFound = false;
 }
 
 /* LEVELCOMPLETE()
@@ -359,6 +382,7 @@ void loop() {
     drawGrid();
     drawCursor();
     drawEnemies();
+    drawHealth();
     display.display();
 
     // --- GAME STATES ---
