@@ -45,4 +45,4 @@ arduino-cesto/
   <img src="https://github.com/gettingfunkier/arduino-cesto/blob/main/demo.png"/>
 </div>
 
-Note: the blueprint was simulated without a breadboard, which is required to physically build the project.
+(Note the blueprint was simulated without a breadboard, which is required to physically build the project!)
