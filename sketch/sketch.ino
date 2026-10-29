@@ -6,8 +6,8 @@
  * (C) E. Balcioglu & J. Hamilton, 2026
  */
 
-#define BUTTON_PIN  2
-#define SPEAKER_PIN 3
+#define BUTTON_PIN  3
+#define SPEAKER_PIN 8
 #define JOY_HORZ    A0
 #define JOY_VERT    A1
 #define RANDOM_PIN  A2
@@ -82,7 +82,6 @@ void setup() {
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(SPEAKER_PIN, OUTPUT);
     
-
     startLevel();
     playHello();
 }
@@ -149,7 +148,6 @@ void assignCell() {
         
         playerHealth--;
         currEnemy++;
-
         playEnemy();
     }
     
@@ -157,9 +155,9 @@ void assignCell() {
         healthFound = true;
         healthCol = cursorCol;
         healthRow = cursorRow;
+
         playerHealth += HEALTH_UP;
         if(playerHealth > 6) playerHealth = 6;
-
         playHealth();
     } 
     
@@ -284,6 +282,7 @@ void drawGrid() {
  *      - Door information;
  */
 void drawHUD() {
+
     // Draw player health
     display.setCursor(98, 4);
     display.setTextSize(2);
@@ -294,6 +293,11 @@ void drawHUD() {
     display.setCursor(112, 4);
     display.setTextSize(1);
     display.print("HP");
+
+    // Draw current stage
+    display.setCursor(98, 24);
+    display.setTextSize(1);
+    display.print(currStage);
 
     // Draw door information
     display.setCursor(98, 47);
@@ -314,6 +318,7 @@ void drawEnemies() {
             enemyCol[e] * CELL_W + ENEMY_INSET_X, 
             enemyRow[e] * CELL_H + ENEMY_INSET_Y
         );
+
         display.print("^~^");
         e++;
     }
@@ -329,6 +334,7 @@ void drawHealth() {
             healthCol * CELL_W + HEALTH_INSET_X,
             healthRow * CELL_H + HEALTH_INSET_Y 
         );
+
         display.print("+");
     }
 }
@@ -417,10 +423,7 @@ void loop() {
     // --- UPDATE GAME ---
     moveCursor(horz, vert);
     
-    if (button && !buttonPrev) {
-        revealCell();
-    }
-    
+    if (button && !buttonPrev) revealCell();
     buttonPrev = button;
 
     // --- DRAW DISPLAY ---
