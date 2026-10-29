@@ -65,9 +65,9 @@ int vertPrev              = 0;
 
 // GAME STATE
 int randNum               = 0;
+int currStage             = 1;
+int highScore             = 1;
 bool isHighScore          = false;
-int highScore;
-int currStage;
 
 
 /* SETUP()
