@@ -22,8 +22,9 @@
     {
       "type": "wokwi-buzzer",
       "id": "bz1",
-      "top": 213.6,
-      "left": 136.2,
+      "top": 211.2,
+      "left": -67.2,
+      "rotate": 180,
       "attrs": { "volume": "0.1" }
     }
   ],
