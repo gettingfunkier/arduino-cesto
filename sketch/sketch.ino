@@ -75,16 +75,16 @@ int currStage;
  * Used for config, like starting the display, or assigning pins as I/O.
  */
 void setup() {
-
     Serial.begin(9600);
-    randomSeed(analogRead(RANDOM_PIN));
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     
-    // make input 2 button and output 3 speaker
+    randomSeed(analogRead(RANDOM_PIN));
     pinMode(BUTTON_PIN, INPUT_PULLUP);
     pinMode(SPEAKER_PIN, OUTPUT);
     
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+
     startLevel();
+    playHello();
 }
 
 /* PARSEJOYSTICK() - x and y
@@ -149,6 +149,8 @@ void assignCell() {
         
         playerHealth--;
         currEnemy++;
+
+        playEnemy();
     }
     
     else if (randNum > 6 && !healthFound) {
@@ -157,7 +159,11 @@ void assignCell() {
         healthRow = cursorRow;
         playerHealth += HEALTH_UP;
         if(playerHealth > 6) playerHealth = 6;
-    }
+
+        playHealth();
+    } 
+    
+    else playSelect();
 }
 
 /* REVEALCELL()
@@ -169,7 +175,6 @@ void revealCell() {
         revealed[cursorCol][cursorRow] = true;
         doorsOpened++;
         assignCell();
-        playSelect();
     }
 }
 
@@ -241,7 +246,7 @@ void gameOver() {
     display.setTextSize(1);
     display.print("GAME OVER");
 
-    display.setCursor(25, 32);
+    display.setCursor(24, 32);
     display.print("High Score: ");
     display.print(highScore);
     display.display();
@@ -253,6 +258,7 @@ void gameOver() {
     delay(1000);
 
     startLevel();
+    playHello();
 }
 
 /* DRAWGRID()
@@ -288,8 +294,6 @@ void drawHUD() {
     display.setCursor(112, 4);
     display.setTextSize(1);
     display.print("HP");
-
-    // Draw current stage
 
     // Draw door information
     display.setCursor(98, 47);
@@ -329,11 +333,47 @@ void drawHealth() {
     }
 }
 
+/* PLAYHELLO()
+ * Function that plays sound at game start.
+ */
+void playHello() {
+    tone(SPEAKER_PIN, NOTE_C4, 30);
+    delay(80);
+
+    tone(SPEAKER_PIN, NOTE_E4, 30);
+    delay(80);
+
+    tone(SPEAKER_PIN, NOTE_G4, 30);
+    delay(80);
+
+    tone(SPEAKER_PIN, NOTE_C5, 30);
+    delay(80);
+
+    tone(SPEAKER_PIN, NOTE_C6, 30);
+    delay(80);
+}
+
 /* PLAYSELECT()
  * Function that plays sound at cell selection.
  */
 void playSelect() {
-  tone(SPEAKER_PIN, NOTE_C5, 30);
+    tone(SPEAKER_PIN, NOTE_C5, 30);
+}
+
+/* PLAYENEMY()
+ * Function that plays sound at enemy reveal.
+ */
+void playEnemy() {
+    tone(SPEAKER_PIN, NOTE_C7, 200);
+}
+
+/* PLAYHEALTH()
+ * Function that plays sound at health reveal.
+ */
+void playHealth() {
+    tone(SPEAKER_PIN, NOTE_C6, 70);
+    delay(70);
+    tone(SPEAKER_PIN, NOTE_G6, 130);
 }
 
 /* PLAYGAMEOVER()
@@ -359,21 +399,6 @@ void playGameOver() {
     delay(250);
 }
 
-/* DEBUG()
- * Utility function to debug code.
- */
-void debug(int button, int horz, int vert) {
-    // DEBUG: button state
-    Serial.print("Button: ");
-    Serial.print(button);
-
-    // DEBUG: joystick position
-    Serial.print(" X: ");
-    Serial.print(horz);
-    Serial.print(" Y: ");
-    Serial.println(vert);
-}
-
 /* LOOP()
  * Function that runs forever, while the board has power, starting as soon as setup() finishes.
  * Without a delay(ms), it can run thousands of times a second.
@@ -388,8 +413,6 @@ void loop() {
     int button = 0;
     if (button_raw == 0) { button = 1;
     } else button = 0;
-
-    debug(button, horz, vert);
 
     // --- UPDATE GAME ---
     moveCursor(horz, vert);
