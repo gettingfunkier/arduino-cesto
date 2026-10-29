@@ -2,7 +2,7 @@
 
 > Soul-cesto style arduino game
 
-### Directories:
+## Directories
 
 ```
 arduino-cesto/
@@ -17,7 +17,7 @@ arduino-cesto/
 └─ README.md          # PROJECT FRONTPAGE
 ```
 
-### Requirements:
+## Requirements
 
 - Arduino Uno
 - Adafruit SSD1306 128x64 OLED display
@@ -25,7 +25,7 @@ arduino-cesto/
 - Piezo buzzer (pin 8)
 - Bi-directional analog stick (VRx: pin A0, VRy: pin A1)
 
-### Achievements:
+## Achievements
 
 - Reading button and joystick inputs
 - Working grid and cursor
@@ -39,7 +39,7 @@ arduino-cesto/
 - Tracking high score and updating it at the end of each game
 
 
-### Blueprint:
+## Blueprint
 
 <div align="center">
   <img src="https://github.com/gettingfunkier/arduino-cesto/blob/main/demo.png"/>
