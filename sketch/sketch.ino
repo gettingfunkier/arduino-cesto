@@ -2,6 +2,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+/* ARDUINO CESTO SOURCE CODE
+ * (C) E. Balcioglu & J. Hamilton, 2026
+ */
+
 #define BUTTON_PIN  2
 #define SPEAKER_PIN 3
 #define JOY_HORZ    A0
@@ -25,7 +29,7 @@ const int BOX_W            = 30;
 const int BOX_H            = 20;
 bool revealed[GRID_COLS][GRID_ROWS];
 
-//HEALING
+// HEALING
 const int HEALTH_UP        = 2;
 const int HEALTH_INSET_X   = 10;
 const int HEALTH_INSET_Y   = 3;
