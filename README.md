@@ -1,6 +1,6 @@
 # ARDUINO-CESTO
 
-> Soul-cesto style arduino game
+> Sol Cesto style arduino game
 
 ## Directories
 
