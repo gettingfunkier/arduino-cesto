@@ -42,5 +42,5 @@ arduino-cesto/
 ### Blueprint:
 
 <div align="center">
-  <img src="https://github.com/gettingfunkier/arduino-cesto/blob/demo.png"/>
+  <img src="https://github.com/gettingfunkier/arduino-cesto/blob/main/demo.png"/>
 </div>
