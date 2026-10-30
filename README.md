@@ -19,7 +19,7 @@ arduino-cesto/
 
 ## Requirements
 
-- Arduino Uno
+- Arduino Uno (R3)
 - Adafruit SSD1306 128x64 OLED display
 - Push-button (pin 3)
 - Piezo buzzer (pin 8)
@@ -45,4 +45,4 @@ arduino-cesto/
   <img src="https://github.com/gettingfunkier/arduino-cesto/blob/main/demo.png"/>
 </div>
 
-*(note that the blueprint was simulated without a breadboard on [wokwi.com](https://wokwi.com), but a breadboard is required to physically build the project!)*
+*(note that the blueprint was simulated without a breadboard on [wokwi.com](https://wokwi.com), but a breadboard is required to physically build the project, unless the wires are soldered!)*
