@@ -137,7 +137,7 @@ void moveCursor(int horz, int vert) {
 /* ASSIGNCELL()
 * Function that handles cell selection.
 * 1/3 chance for cell to be an enemy (max 3 enemies).
-* 1/4 chance for cell to be a health boost (max 1 health boost).
+* 2/9 chance for cell to be a health boost (max 1 health boost).
 */
 void assignCell() {
     randNum = random(9);
@@ -312,7 +312,7 @@ void drawHUD() {
  */
 void drawEnemies() {
     int e = 0;
-    while (enemyFound[e] && e < MAX_ENEMIES) {
+    while (e < MAX_ENEMIES && enemyFound[e]) {
         display.setTextSize(1);
         display.setCursor(
             enemyCol[e] * CELL_W + ENEMY_INSET_X, 
