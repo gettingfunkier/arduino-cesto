@@ -12,8 +12,6 @@ arduino-cesto/
 │   ├── pitches.h     # DEF. MUSIC NOTES
 │   └── sketch.ino    # ARDUINO CODE
 │
-├─ .gitignore         # UNTRACKED FILES
-├─ notebook.md        # NOTEBOOK
 └─ README.md          # PROJECT FRONTPAGE
 ```
 
